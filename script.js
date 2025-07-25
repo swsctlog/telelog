@@ -1,15 +1,19 @@
 window.addEventListener("DOMContentLoaded", () => {
-  const initData = window.Telegram.WebApp.initData || 'No initData received';
-  const output = document.getElementById("initData");
+  const initDataRaw = window.Telegram.WebApp.initData;
+  const params = new URLSearchParams(initDataRaw);
+  const userJSON = params.get("user");
 
   try {
-    const decoded = new URLSearchParams(initData);
-    let formatted = "";
-    decoded.forEach((value, key) => {
-      formatted += `${key}: ${value}\n`;
-    });
-    output.textContent = formatted || "No parameters found.";
+    const user = JSON.parse(userJSON);
+    const username = user.username;
+
+    if (username) {
+      document.getElementById("status").textContent = "Opening @" + username + " in Telegram...";
+      window.location.href = `https://t.me/${username}`;
+    } else {
+      document.getElementById("status").textContent = "No username found.";
+    }
   } catch (e) {
-    output.textContent = "Error parsing initData:\n" + initData;
+    document.getElementById("status").textContent = "Failed to parse user data.";
   }
 });
